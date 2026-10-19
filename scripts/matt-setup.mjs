@@ -298,7 +298,10 @@ export function upgrade(input, apply = false) {
     lock.source = source();
     writeJson(path.join(repo, LOCK), lock);
   }
-  return { applied: apply, replace, scripts, merge, note: merge.length ? 'Fusionner à la main la nouvelle version amont dans chaque copie adaptée, puis lancer upgrade --accept <nom>.' : undefined };
+  // Repo déjà équipé du panel : ajoute ce que les nouvelles versions apportent (agent, règle), sans rien écraser.
+  const panel = readLock(repo).panel?.length ? installPanel(repo, apply) : null;
+  const added = panel ? [...panel.agents.filter(a => a.state === 'add').map(a => a.path), ...panel.skills.filter(s => s.state === 'add').map(s => s.skill)] : [];
+  return { applied: apply, replace, scripts, merge, added, note: merge.length ? 'Fusionner à la main la nouvelle version amont dans chaque copie adaptée, puis lancer upgrade --accept <nom>.' : undefined };
 }
 
 // Après fusion d'une copie adaptée : le lock prend la version amont actuelle comme base.

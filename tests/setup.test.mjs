@@ -392,3 +392,20 @@ test('agents du panel : frontmatter valide, lecture seule, ligne de verdict', ()
     for (const a of agents) assert.match(block, new RegExp('`' + a + '`'), skill + ' → ' + a);
   }
 });
+
+test('mise à jour : un repo équipé du panel reçoit les nouveautés (règle, agent manquant)', t => {
+  const dir = repo(t);
+  install(dir, 'socle', true);
+  installPanel(dir, true);
+  fs.rmSync(path.join(dir, '.claude/rules/matt-decisions.md'));
+  const lockFile = path.join(dir, '.claude/matt-skills.lock.json');
+  const lock = JSON.parse(fs.readFileSync(lockFile, 'utf8'));
+  delete lock.templates['.claude/rules/matt-decisions.md'];
+  fs.writeFileSync(lockFile, JSON.stringify(lock));
+  const preview = upgrade(dir);
+  assert.deepEqual(preview.added, ['.claude/rules/matt-decisions.md']);
+  assert.equal(fs.existsSync(path.join(dir, '.claude/rules/matt-decisions.md')), false);
+  upgrade(dir, true);
+  assert.ok(fs.existsSync(path.join(dir, '.claude/rules/matt-decisions.md')));
+  assert.deepEqual(upgrade(dir).added, []);
+});
