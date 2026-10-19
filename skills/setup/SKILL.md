@@ -44,13 +44,13 @@ Si `inventory` indique `empty: true` (ou un repo sans code ni composant Claude),
 2. le tracker : local `.scratch/` (recommandé sans remote), Jira (clé du projet) ou GitHub ;
 3. front, back, données sensibles ou interface d'administration ?
 
-Puis, après la réponse : `install --skills socle` (+ `wayfinder,implement-spec` si gros ou flou), `install-panel` si la réponse 3 le justifie, configuration Matt (étape 3, sans adaptation), et fin (étape 6). Rappelle de relancer le setup une fois le projet créé : hooks, permissions et rules dépendent de la vraie stack.
+Puis, après la réponse : `install --skills socle` (il contient `wayfinder` et `implement-spec` ; si le dossier n'est pas sous Git, `git init` avant `/implement-spec`), `install-panel` si la réponse 3 le justifie, configuration Matt (étape 3, sans adaptation), et fin (étape 6). Rappelle de relancer le setup une fois le projet créé : hooks, permissions et rules dépendent de la vraie stack.
 
 ## 2. Proposition
 
 Lis [references/skills.md](references/skills.md) : rôle, profil, mode et dépendances de chaque skill.
 
-**Skills de Matt** : le `socle` (15 skills : idée → spec → tickets → code → revue, bugs, retours d'expérience), plus les `optionnels` que le repo justifie (`implement-spec` pour de gros chantiers en parallèle, `triage` si des issues arrivent de l'extérieur, `wayfinder` pour un projet encore flou…). Les `rares` seulement sur demande.
+**Skills de Matt** : le `socle` (19 skills : idée floue ou grosse fonctionnalité → carte des décisions → spec → tickets → code, en parallèle si besoin → revue, bugs, retours d'expérience), plus les `optionnels` que le repo justifie (`triage` si des issues arrivent de l'extérieur, `handoff`, `improve-codebase-architecture`, `wizard`). Les `rares` seulement sur demande. Le socle contient `wayfinder` et `implement-spec` : si le dossier n'est pas sous Git, `git init` est indispensable avant `/implement-spec`.
 
 **Composants existants** : une ligne par composant, avec la preuve tirée de sa lecture.
 

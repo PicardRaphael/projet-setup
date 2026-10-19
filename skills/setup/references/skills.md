@@ -1,4 +1,4 @@
-# Skills de Matt : référence compacte
+| implement-spec | socle || prototype | socle || research | socle || wayfinder | socle |# Skills de Matt : référence compacte
 
 auto = Claude le déclenche ou un autre skill l'appelle (sa description coûte du contexte à chaque session) ; / = lancé par l'utilisateur.
 
@@ -19,11 +19,11 @@ auto = Claude le déclenche ou un autre skill l'appelle (sa description coûte d
 | diagnosing-bugs | socle | auto | bug difficile ou lenteur |  |
 | retro | socle | / | leçons de fin de session | writing-for-agents |
 | writing-for-agents | socle | auto | style des skills et CLAUDE.md |  |
-| implement-spec | optionnels | / | toute une spec en parallèle (worktrees) | tdd, code-review |
+| implement-spec | socle | / | toute une spec en parallèle (worktrees) | tdd, code-review |
 | triage | optionnels | / | issues venant de l'extérieur | grilling, domain-modeling |
-| wayfinder | optionnels | / | très gros chantier encore flou | research, prototype, grilling, domain-modeling |
-| research | optionnels | auto | faits sur sources primaires |  |
-| prototype | optionnels | auto | prototype jetable |  |
+| wayfinder | socle | / | gros projet ou grosse fonctionnalité encore flous | research, prototype, grilling, domain-modeling |
+| research | socle | auto | faits sur sources primaires |  |
+| prototype | socle | auto | prototype jetable |  |
 | handoff | optionnels | / | passation entre sessions |  |
 | improve-codebase-architecture | optionnels | / | code difficile à faire évoluer | codebase-design, grilling, domain-modeling |
 | wizard | optionnels | auto | étapes que seul un humain peut faire |  |

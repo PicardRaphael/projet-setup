@@ -60,7 +60,7 @@ test('repo neuf : inventaire vide puis installation des 27 skills versionnables'
 test('profils : le socle tire ses dépendances, aucune brique appelée ne manque', async t => {
   const dir = repo(t);
   const plan = install(dir, 'socle');
-  assert.equal(plan.add.length, 15);
+  assert.equal(plan.add.length, 19);
   assert.deepEqual(plan.addedAsDependency, []);
   const wayfinder = install(dir, 'wayfinder');
   assert.deepEqual(wayfinder.addedAsDependency.sort(), ['domain-modeling', 'grilling', 'prototype', 'research']);

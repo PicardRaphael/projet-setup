@@ -28,11 +28,13 @@ export const DEPENDENCIES = {
   'triage': ['grilling', 'domain-modeling'],
 };
 
-// socle : flux complet idée → spec → tickets → code → revue, plus bugs et retours d'expérience.
+// socle : flux complet idée floue ou grosse fonctionnalité → carte (wayfinder) → spec → tickets → code
+// (implement ou implement-spec en parallèle) → revue, plus bugs et retours d'expérience.
+// wayfinder et implement-spec se lancent à la main : ils ne coûtent aucun contexte tant qu'on ne s'en sert pas.
 // optionnels : proposés selon le repo. Les autres restent disponibles avec --skills.
 export const PROFILES = {
-  socle: ['ask-matt', 'setup-matt-pocock-skills', 'grill-with-docs', 'grilling', 'domain-modeling', 'to-spec', 'to-tickets', 'implement', 'tdd', 'code-review', 'codebase-design', 'pr', 'diagnosing-bugs', 'retro', 'writing-for-agents'],
-  optionnels: ['implement-spec', 'triage', 'wayfinder', 'research', 'prototype', 'handoff', 'improve-codebase-architecture', 'wizard'],
+  socle: ['ask-matt', 'setup-matt-pocock-skills', 'grill-with-docs', 'grilling', 'domain-modeling', 'wayfinder', 'research', 'prototype', 'to-spec', 'to-tickets', 'implement', 'implement-spec', 'tdd', 'code-review', 'codebase-design', 'pr', 'diagnosing-bugs', 'retro', 'writing-for-agents'],
+  optionnels: ['triage', 'handoff', 'improve-codebase-architecture', 'wizard'],
   rares: ['grill-me', 'to-questionnaire', 'wait-what', 'teach'],
 };
 
@@ -478,6 +480,7 @@ export function installPanel(input, apply = false) {
   return {
     applied: apply, agents: plan.templates, skills: patched, memoryGuard: guard,
     notInstalled: Object.keys(PANEL).filter(s => !lock.skills[s]),
+    ...(lock.skills['implement-spec'] ? {} : { approverMissing: "L'approbateur n'est installé qu'avec implement-spec (dans le socle)." }),
     note: plan.templates.some(t => t.state === 'different') ? 'Un agent du repo porte déjà ce nom : il est gardé. Vérifier qu\'il rend la même ligne de verdict, ou adapter le bloc du skill.' : undefined,
   };
 }

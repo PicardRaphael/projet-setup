@@ -11,7 +11,7 @@ Dans le repo, lance `/matt-setup:setup`. Claude lit le repo, propose, et n'appli
 | Étape | Ce qui se passe |
 |---|---|
 | 1. Inventaire | Lecture de CLAUDE.md, skills, agents, rules, hooks, stack (gestionnaire npm/pnpm/uv/poetry, outils de test, SDK d'IA) et tracker |
-| 2. Proposition | Le socle de 15 skills Matt + les optionnels utiles. Pour chacun de tes composants : **garder**, **brancher** (l'appeler depuis un skill Matt ou un agent), **intégrer** dans un skill Matt, ou **archiver** |
+| 2. Proposition | Le socle de 19 skills Matt + les optionnels utiles. Pour chacun de tes composants : **garder**, **brancher** (l'appeler depuis un skill Matt ou un agent), **intégrer** dans un skill Matt, ou **archiver** |
 | 3. Configuration et adaptation | La configuration prévue par Matt (`docs/agents/*.md`), puis les skills modifiés selon tes conventions, diff à l'appui |
 | 4. Nettoyage | Les éléments acceptés partent dans `.claude/skills-archive/` (réversible) |
 | 5. Optimisations | Permissions, hooks (formatage, bons outils), rules, worktrees, serveurs MCP utiles, et pour le tracker local un tableau de bord et la reprise au démarrage |
@@ -79,7 +79,7 @@ Un petit bug ou une petite tâche : `/implement` directement, ou `diagnosing-bug
 | Situation | Skill |
 |---|---|
 | Bug difficile, lenteur | `diagnosing-bugs` (auto) : reproduire → hypothèses → instrumenter → corriger → test de non-régression |
-| Très gros chantier encore flou | `/wayfinder` : carte de tickets-questions (recherche, prototype, décision) résolus avant la spec |
+| Gros projet ou grosse fonctionnalité encore flous | `/wayfinder` : carte de tickets-questions (recherche, prototype, décision) résolus avant la spec |
 | Issues venant de l'extérieur | `/triage` : tri, vérification, brief prêt pour un agent |
 | Code difficile à faire évoluer | `/improve-codebase-architecture` : rapport des modules à approfondir, puis discussion |
 | « Ça ressemblerait à quoi ? » | `prototype` (auto) : prototype jetable pour trancher une question d'état ou d'interface |
@@ -105,8 +105,8 @@ Un petit bug ou une petite tâche : `/implement` directement, ou `diagnosing-bug
 
 | Profil | Skills | Quand |
 |---|---|---|
-| **socle** (15) | ask-matt, setup-matt-pocock-skills, grill-with-docs, grilling, domain-modeling, to-spec, to-tickets, implement, tdd, code-review, codebase-design, pr, diagnosing-bugs, retro, writing-for-agents | tous les repos |
-| **optionnels** (8) | implement-spec, triage, wayfinder, research, prototype, handoff, improve-codebase-architecture, wizard | selon le repo |
+| **socle** (19) | ask-matt, setup-matt-pocock-skills, grill-with-docs, grilling, domain-modeling, wayfinder, research, prototype, to-spec, to-tickets, implement, implement-spec, tdd, code-review, codebase-design, pr, diagnosing-bugs, retro, writing-for-agents | tous les repos |
+| **optionnels** (4) | triage, handoff, improve-codebase-architecture, wizard | selon le repo |
 | **rares** (4) | grill-me, to-questionnaire, wait-what, teach | sur demande |
 
 Pas les 27 partout : chaque skill **auto** ajoute sa description au contexte de chaque session, et trop d'entrées brouillent le choix. Les briques nécessaires sont ajoutées automatiquement (choisir `wayfinder` ajoute `research` et `prototype`).
