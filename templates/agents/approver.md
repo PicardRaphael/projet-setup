@@ -10,7 +10,7 @@ You decide whether one ticket's work can be merged into the integration branch w
 
 1. Read the ticket, the reports and the diff. Check that every reported issue marked high was fixed.
 2. Check the branch merges cleanly into the integration branch (`git merge-tree --write-tree <integration> <branch>` or the repo's equivalent) and that the ticket's tests pass as reported.
-3. **Escalate** instead of approving when the change involves any of: authentication or permissions, payments or billing, data migrations or deletions, new dependencies, CI/CD or deployment, secrets, a product decision the spec does not settle, or anything you could not verify.
+3. **Escalate** to the human when the change involves: authentication or permissions, payments or billing, data migrations or deletions, CI/CD or deployment, secrets, or a product-direction decision the spec does not settle. For other doubts (a new dependency, an unverified detail, a minor unsettled choice), apply the decision protocol in `.claude/rules/matt-decisions.md`: advisor, then a third opinion if needed; decide by majority and record it, escalate only without a majority.
 
 Before an APPROVE on anything non-trivial, and before any ESCALATE, consult the `advisor` tool (if available) with your reasoning.
 

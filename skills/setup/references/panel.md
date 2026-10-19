@@ -4,10 +4,10 @@ Ajoute aux skills de Matt des agents qui contredisent le plan et relisent sous d
 
 | Agent | Modèle | Appelé par | Rôle |
 |---|---|---|---|
-| `plan-challenger` | opus, effort high | `to-spec`, `wayfinder` | trois instances en parallèle (produit, technique, simplicité) contredisent le plan avant publication |
-| `internal-researcher` | haiku | `wayfinder` | faits sur les systèmes existants de l'organisation : autres repos, bases de connaissances, endpoints |
+| `plan-challenger` | opus, effort medium | `to-spec`, `wayfinder` | trois instances en parallèle (produit, technique, simplicité) contredisent le plan avant publication |
+| `internal-researcher` | sonnet | `wayfinder` | faits sur les systèmes existants de l'organisation : autres repos, bases de connaissances, endpoints |
 | `security-reviewer` | opus, effort high | `code-review` | si le diff touche auth, routes, données, secrets, dépendances |
-| `ui-reviewer` | sonnet, effort high | `code-review` | si le diff touche le front ; regarde l'application si un serveur de dev tourne et qu'un navigateur est disponible, sinon relit le code |
+| `ui-reviewer` | sonnet, effort medium | `code-review` | si le diff touche le front ; regarde l'application si un serveur de dev tourne et qu'un navigateur est disponible, sinon relit le code |
 | `security-reviewer`, `ui-reviewer` | | `diagnosing-bugs` | le correctif d'un bug passe par `code-review` avant d'être déclaré terminé |
 | `approver` | opus, effort high | `implement-spec` | avant chaque fusion : APPROVE, REWORK (2 fois au plus) ou ESCALATE vers « Attend un humain » |
 
@@ -35,11 +35,11 @@ Aucun n'a d'outil d'édition (`disallowedTools: Edit, Write, NotebookEdit`) ; Ba
    Les repos cités doivent être lisibles par la session : dans l'app, les ajouter comme dossiers de la session ; en CLI, `--add-dir`.
 4. `ui-reviewer` voit l'application si un serveur de dev tourne pour le worktree et qu'un outil navigateur est disponible ; sinon il relit le code et le dit.
 
-## Choix des modèles
+## Choix des modèles et décisions
 
-Haiku 5.5 (environ 40 fois moins cher qu'Opus 5.5) pour chercher et lire : aussi fiable qu'Opus sur la lecture, nettement moins bon pour coder ou juger. Opus avec effort `high` pour tout ce qui juge (contradicteurs, sécurité, approbation) : Opus 5.5 réfléchit par défaut en `medium`. Les implémenteurs et relecteurs de Matt héritent du modèle de la session : la garder sur Opus (ou Fable pour `/grill-with-docs` et `/wayfinder`, où la qualité du raisonnement prime).
+Sonnet 5.5 pour chercher (rapide, analyse fiable), Opus pour juger ; effort `high` seulement pour la sécurité et l'approbation, `medium` ailleurs pour rester fluide. Haiku 5.5 n'est pas utilisé : il est réservé aux tâches étroites, et une mauvaise analyse coûte plus cher qu'un modèle plus capable.
 
-Si l'utilisateur a configuré un conseiller (`/advisor`, par exemple Fable), les sous-agents y ont accès, Haiku compris : chaque agent du panel sait quand le consulter (objection forte, verdict hésitant, approbation non triviale, escalade, sources contradictoires).
+`install-panel` installe aussi `.claude/rules/matt-decisions.md` : avant de poser une question, l'agent consulte le conseiller ; s'ils sont d'accord, il décide et le note ; sinon un troisième avis tranche à la majorité. Restent toujours à l'humain : direction produit et périmètre, sécurité, actions irréversibles, argent, publication, déploiement.
 
 ## Coût
 

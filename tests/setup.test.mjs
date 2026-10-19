@@ -359,6 +359,7 @@ test('panel : agents installés, skills branchés, toujours « intacts » et reb
   installPanel(dir, true);
   for (const a of ['plan-challenger', 'ui-reviewer', 'approver', 'internal-researcher']) assert.ok(fs.existsSync(path.join(dir, '.claude/agents', a + '.md')), a);
   assert.match(fs.readFileSync(path.join(dir, '.claude/agents/security-reviewer.md'), 'utf8'), /maison/, 'agent du repo jamais écrasé');
+  assert.match(fs.readFileSync(path.join(dir, '.claude/rules/matt-decisions.md'), 'utf8'), /Two of three agree/);
   const review = fs.readFileSync(path.join(dir, '.claude/skills/code-review/SKILL.md'), 'utf8');
   assert.match(review, /<!-- matt-setup:panel:start -->[\s\S]*security-reviewer[\s\S]*<!-- matt-setup:panel:end -->\r?\n$/);
   installPanel(dir, true);
@@ -383,7 +384,7 @@ test('panel : agents installés, skills branchés, toujours « intacts » et reb
 test('agents du panel : frontmatter valide, lecture seule, ligne de verdict', () => {
   for (const name of ['plan-challenger', 'security-reviewer', 'ui-reviewer', 'approver', 'internal-researcher']) {
     const text = fs.readFileSync(path.join(ROOT, 'templates/agents', name + '.md'), 'utf8');
-    assert.match(text, new RegExp('^---\nname: ' + name + '\ndescription: .+\ndisallowedTools: Edit, Write, NotebookEdit\nmodel: (opus|sonnet|haiku)\neffort: (medium|high)\n---'), name);
+    assert.match(text, new RegExp('^---\nname: ' + name + '\ndescription: .+\ndisallowedTools: Edit, Write, NotebookEdit\nmodel: (opus|sonnet)\neffort: (medium|high)\n---'), name);
     assert.match(text, /^(VERDICT|DECISION|ANSWER): /m, name);
   }
   for (const [skill, agents] of Object.entries(PANEL)) {

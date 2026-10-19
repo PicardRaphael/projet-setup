@@ -47,7 +47,7 @@ Les skills sont copiés dans `.claude/skills/` et versionnés : toute l'équipe 
 | `ui-reviewer` | revue d'un diff front | parcours, états, accessibilité ; regarde l'application si un serveur de dev tourne et qu'un navigateur est disponible, sinon relit le code |
 | `approver` | avant chaque fusion d'implement-spec | approuve, demande une reprise (2 fois au plus) ou escalade vers toi |
 
-Modèles : Haiku 5.5 pour chercher (rapide, environ 40 fois moins cher), Opus avec réflexion renforcée pour juger. Garde ta session sur Opus (effort high). Si tu as un conseiller (`/advisor fable`), les agents le consultent aux moments critiques, Haiku compris. Ils s'ajoutent aux deux revues de Matt (normes et spec) sans les remplacer, n'ont aucun outil d'édition (Bash reste disponible pour git) et ne tournent que lorsqu'ils sont concernés.
+Modèles : Sonnet 5.5 pour chercher, Opus pour juger (effort high pour la sécurité et l'approbation). **Moins d'interruptions** : avant de te poser une question, un agent consulte le conseiller ; d'accord, il décide et le note ; en désaccord, un troisième avis tranche à la majorité. Tu restes seul juge du périmètre produit, de la sécurité, de l'irréversible, de l'argent et de ce qui est publié. Garde ta session sur Opus (effort medium ou high) et un conseiller (`/advisor fable`). Ils s'ajoutent aux deux revues de Matt (normes et spec) sans les remplacer, n'ont aucun outil d'édition (Bash reste disponible pour git) et ne tournent que lorsqu'ils sont concernés.
 
 ## 2. Travailler avec les skills
 

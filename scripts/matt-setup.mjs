@@ -354,6 +354,7 @@ export const TEMPLATES = {
   'use-cli': ['templates/hooks/use-cli.mjs', '.claude/hooks/use-cli.mjs'],
   ...Object.fromEntries(['plan-challenger', 'security-reviewer', 'ui-reviewer', 'approver', 'internal-researcher']
     .map(name => [name, ['templates/agents/' + name + '.md', '.claude/agents/' + name + '.md']])),
+  decisions: ['templates/rules/decisions.md', '.claude/rules/matt-decisions.md'],
 };
 
 // Panel de spécialistes : quels agents chaque skill de Matt appelle, via un bloc ajouté à la fin de sa copie.
@@ -382,7 +383,7 @@ export function installPanel(input, apply = false) {
   if (!lock) throw new Error('Installer d\'abord les skills de Matt (install)');
   const skills = Object.keys(PANEL).filter(s => lock.skills[s]);
   const agents = [...new Set(skills.flatMap(s => PANEL[s]))];
-  const plan = installTemplates(repo, agents.join(','), apply);
+  const plan = installTemplates(repo, [...agents, 'decisions'].join(','), apply);
   const patched = skills.map(s => {
     const file = path.join(repo, SKILLS_DIR, s, 'SKILL.md');
     const already = fs.existsSync(file) && fs.readFileSync(file, 'utf8').includes(PANEL_START);

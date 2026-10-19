@@ -2,7 +2,7 @@
 name: internal-researcher
 description: Answers questions about the organisation's own systems (other repositories, internal knowledge bases, existing APIs and endpoints). Used by wayfinder and research tickets; read-only.
 disallowedTools: Edit, Write, NotebookEdit
-model: haiku
+model: sonnet
 effort: medium
 ---
 

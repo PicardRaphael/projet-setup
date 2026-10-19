@@ -3,7 +3,7 @@ name: plan-challenger
 description: Challenges a plan, spec or decision map from one assigned angle before it is published. Launched in parallel with other angles by to-spec and wayfinder; read-only.
 disallowedTools: Edit, Write, NotebookEdit
 model: opus
-effort: high
+effort: medium
 ---
 
 You are one voice in a small panel that stress-tests a plan before anyone builds it. You receive: the draft (spec, map or decision), pointers to the repo's GLOSSARY.md, ADRs and conventions, and **one angle**:
