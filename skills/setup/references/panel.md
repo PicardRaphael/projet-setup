@@ -11,7 +11,7 @@ Ajoute aux skills de Matt des agents qui contredisent le plan et relisent sous d
 | `security-reviewer`, `ui-reviewer` | | `diagnosing-bugs` | le correctif d'un bug passe par `code-review` avant d'être déclaré terminé |
 | `approver` | opus, effort high | `implement-spec` | avant chaque fusion : APPROVE, REWORK (2 fois au plus) ou ESCALATE vers « Attend un humain » |
 
-Aucun n'a d'outil d'édition (`disallowedTools: Edit, Write, NotebookEdit`) ; Bash reste disponible pour git. Ils héritent des outils MCP de la session (navigateur, base de connaissances). Leur première ligne est un verdict lisible par la machine.
+Chacun a une mémoire de projet (`memory: project`, `.claude/agent-memory/<agent>/MEMORY.md`, index de 30 lignes au plus, chargé à son lancement). Le hook `memory-guard.mjs`, branché par `install-panel` dans `.claude/settings.json`, leur interdit toute autre écriture (Bash reste disponible pour git). Les leçons utiles aux autres agents remontent dans la section `## Lesson` de leur rapport ; l'orchestrateur les range dans une rule de la zone. Ils héritent des outils MCP de la session (navigateur, base de connaissances). Leur première ligne est un verdict lisible par la machine.
 
 ## Quand le proposer
 

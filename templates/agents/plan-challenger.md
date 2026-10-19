@@ -1,7 +1,8 @@
 ---
 name: plan-challenger
-description: Challenges a plan, spec or decision map from one assigned angle before it is published. Launched in parallel with other angles by to-spec and wayfinder; read-only.
-disallowedTools: Edit, Write, NotebookEdit
+description: Challenges a plan, spec or decision map from one assigned angle before it is published. Launched in parallel with other angles by to-spec and wayfinder; does not edit code (writes only its own memory).
+disallowedTools: NotebookEdit
+memory: project
 model: opus
 effort: medium
 ---
@@ -32,3 +33,11 @@ VERDICT: SOUND | CONCERNS
 ```
 
 Do not rewrite the plan, edit files, create tickets or implement anything. Disagree openly when the evidence supports it; agreeing by default is a failure of this role.
+
+## Your memory
+
+Your project memory (`.claude/agent-memory/<your name>/`, shared with the team through git) is loaded when you start: check it before working, it holds what earlier runs of your role learned in this repo.
+
+Before returning, record only a lesson that will matter again for **your role**, is not already visible in the code, and is not already in memory: one line in `MEMORY.md`, which stays an index of 30 lines at most (put details in a separate file of that folder and link it). Remove lines that became wrong or useless. You may write nowhere else.
+
+A lesson for **other agents** (for example a mistake the implementers keep making) goes under `## Lesson` in your report, with the area it applies to: the orchestrator files it where everyone will see it.

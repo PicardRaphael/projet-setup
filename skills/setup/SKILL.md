@@ -35,7 +35,7 @@ Résume : repo neuf ou existant, tracker probable (remote, MCP Atlassian, `.scra
 
 Ne lis les fichiers de `references/` qu'à l'étape qui les cite.
 
-Si `alwaysLoaded.overBudget` est vrai (CLAUDE.md, ses imports et les rules sans `paths:` dépassent environ 2 500 tokens chargés à chaque session) : propose à l'étape 5 de garder dans CLAUDE.md seulement ce qui sert presque à chaque session, de déplacer le reste vers des rules à `paths:` ou vers `docs/`, et de supprimer ce qui est devenu inutile, en montrant le gain en tokens.
+Si un agent de `agentMemory` a `overLimit` (plus de 30 lignes dans son `MEMORY.md`), propose de le condenser avec lui. Si `alwaysLoaded.overBudget` est vrai (CLAUDE.md, ses imports et les rules sans `paths:` dépassent environ 2 500 tokens chargés à chaque session) : propose à l'étape 5 de garder dans CLAUDE.md seulement ce qui sert presque à chaque session, de déplacer le reste vers des rules à `paths:` ou vers `docs/`, et de supprimer ce qui est devenu inutile, en montrant le gain en tokens.
 
 ### Repo vide : chemin rapide
 

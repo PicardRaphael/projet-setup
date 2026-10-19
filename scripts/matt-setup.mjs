@@ -194,6 +194,16 @@ function alwaysLoaded(repo) {
   const total = files.reduce((n, f) => n + f.tokens, 0);
   return { totalTokens: total, budget: ALWAYS_LOADED_BUDGET, overBudget: total > ALWAYS_LOADED_BUDGET, files: files.sort((a, b) => b.tokens - a.tokens) };
 }
+// Mémoire de chaque agent (.claude/agent-memory/<agent>/MEMORY.md) : ses 200 premières lignes sont chargées à chaque lancement de l'agent.
+function agentMemory(repo) {
+  const root = path.join(repo, '.claude/agent-memory');
+  if (!fs.existsSync(root)) return [];
+  return fs.readdirSync(root, { withFileTypes: true }).filter(e => e.isDirectory()).map(e => {
+    const file = path.join(root, e.name, 'MEMORY.md');
+    const lines = isRegular(file) ? fs.readFileSync(file, 'utf8').split('\n').filter(l => l.trim()).length : 0;
+    return { agent: e.name, lines, overLimit: lines > 30 };
+  });
+}
 const isRegular = file => { try { return fs.statSync(file).isFile(); } catch { return false; } };
 
 export function inventory(input, home = os.homedir()) {
@@ -236,6 +246,7 @@ export function inventory(input, home = os.homedir()) {
     },
     stack: stack(repo),
     alwaysLoaded: alwaysLoaded(repo),
+    agentMemory: agentMemory(repo),
     matt: lock ? { source: lock.source, installed: [...managed] } : null,
   };
 }
@@ -390,6 +401,7 @@ export const TEMPLATES = {
   ...Object.fromEntries(['plan-challenger', 'security-reviewer', 'ui-reviewer', 'approver', 'internal-researcher']
     .map(name => [name, ['templates/agents/' + name + '.md', '.claude/agents/' + name + '.md']])),
   decisions: ['templates/rules/decisions.md', '.claude/rules/matt-decisions.md'],
+  'memory-guard': ['templates/hooks/memory-guard.mjs', '.claude/hooks/memory-guard.mjs'],
 };
 
 // Panel de spécialistes : quels agents chaque skill de Matt appelle, via un bloc ajouté à la fin de sa copie.
@@ -411,6 +423,25 @@ function appendPanel(file, skill) {
   return true;
 }
 
+const GUARD_COMMAND = 'node "$CLAUDE_PROJECT_DIR/.claude/hooks/memory-guard.mjs"';
+
+// Ajoute (ou complète) le hook PreToolUse du garde de mémoire dans .claude/settings.json, sans toucher au reste.
+function guardHook(repo, agents, apply) {
+  const file = path.join(repo, '.claude/settings.json');
+  let settings = {};
+  if (fs.existsSync(file)) { try { settings = readJson(file); } catch { return { state: 'invalid-settings', note: '.claude/settings.json est invalide : ajouter le hook à la main.' }; } }
+  const command = GUARD_COMMAND + ' ' + agents.join(' ');
+  const groups = ((settings.hooks ||= {}).PreToolUse ||= []);
+  const existing = groups.flatMap(g => g.hooks || []).find(h => String(h.command || '').startsWith(GUARD_COMMAND));
+  if (existing && existing.command === command) return { state: 'same' };
+  if (apply) {
+    if (existing) existing.command = command;
+    else groups.push({ matcher: 'Edit|Write|NotebookEdit', hooks: [{ type: 'command', command }] });
+    writeJson(file, settings);
+  }
+  return { state: existing ? 'update' : 'add', command };
+}
+
 // Installe les agents du panel et branche les skills de Matt déjà installés. Un agent du repo de même nom n'est jamais écrasé.
 export function installPanel(input, apply = false) {
   const repo = repoRoot(input);
@@ -418,7 +449,9 @@ export function installPanel(input, apply = false) {
   if (!lock) throw new Error('Installer d\'abord les skills de Matt (install)');
   const skills = Object.keys(PANEL).filter(s => lock.skills[s]);
   const agents = [...new Set(skills.flatMap(s => PANEL[s]))];
-  const plan = installTemplates(repo, [...agents, 'decisions'].join(','), apply);
+  const plan = installTemplates(repo, [...agents, 'decisions', 'memory-guard'].join(','), apply);
+  // Le garde de mémoire doit être branché dans .claude/settings.json pour que les agents restent sans édition du code.
+  const guard = guardHook(repo, agents, apply);
   const patched = skills.map(s => {
     const file = path.join(repo, SKILLS_DIR, s, 'SKILL.md');
     const already = fs.existsSync(file) && fs.readFileSync(file, 'utf8').includes(PANEL_START);
@@ -431,7 +464,7 @@ export function installPanel(input, apply = false) {
     writeJson(path.join(repo, LOCK), next);
   }
   return {
-    applied: apply, agents: plan.templates, skills: patched,
+    applied: apply, agents: plan.templates, skills: patched, memoryGuard: guard,
     notInstalled: Object.keys(PANEL).filter(s => !lock.skills[s]),
     note: plan.templates.some(t => t.state === 'different') ? 'Un agent du repo porte déjà ce nom : il est gardé. Vérifier qu\'il rend la même ligne de verdict, ou adapter le bloc du skill.' : undefined,
   };
