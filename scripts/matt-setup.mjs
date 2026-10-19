@@ -68,6 +68,10 @@ function frontmatter(file) {
 }
 
 // Hash de chaque fichier d'un dossier, chemins relatifs en notation POSIX.
+const PANEL_START = '<!-- matt-setup:panel:start -->';
+const PANEL_END = '<!-- matt-setup:panel:end -->';
+const stripPanel = text => text.replace(/\n*<!-- matt-setup:panel:start -->[\s\S]*?<!-- matt-setup:panel:end -->\n?/g, '\n').replace(/\n+$/, '\n');
+
 function hashTree(dir) {
   const files = {};
   const walk = current => {
@@ -75,6 +79,8 @@ function hashTree(dir) {
       const file = path.join(current, entry.name);
       if (entry.isSymbolicLink()) continue;
       if (entry.isDirectory()) walk(file);
+      // Le bloc du panel ajouté par install-panel ne compte pas comme une adaptation : le skill reste à jour automatiquement.
+      else if (entry.name === 'SKILL.md') files[posix(path.relative(dir, file))] = sha(stripPanel(fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n')));
       else files[posix(path.relative(dir, file))] = contentHash(file);
     }
   };
@@ -286,6 +292,7 @@ export function upgrade(input, apply = false) {
       const target = path.join(repo, SKILLS_DIR, name);
       fs.rmSync(target, { recursive: true });
       fs.cpSync(s.dir, target, { recursive: true });
+      if (lock.panel?.includes(name)) appendPanel(path.join(target, 'SKILL.md'), name);
       lock.skills[name] = { files: hashTree(s.dir) };
     }
     lock.source = source();
@@ -345,7 +352,54 @@ export const TEMPLATES = {
   board: ['templates/board.mjs', BOARD],
   'on-edit': ['templates/hooks/on-edit.mjs', '.claude/hooks/on-edit.mjs'],
   'use-cli': ['templates/hooks/use-cli.mjs', '.claude/hooks/use-cli.mjs'],
+  ...Object.fromEntries(['plan-challenger', 'security-reviewer', 'ui-reviewer', 'approver', 'internal-researcher']
+    .map(name => [name, ['templates/agents/' + name + '.md', '.claude/agents/' + name + '.md']])),
 };
+
+// Panel de spécialistes : quels agents chaque skill de Matt appelle, via un bloc ajouté à la fin de sa copie.
+export const PANEL = {
+  'to-spec': ['plan-challenger'],
+  'wayfinder': ['plan-challenger', 'internal-researcher'],
+  'code-review': ['security-reviewer', 'ui-reviewer'],
+  'implement-spec': ['approver'],
+  // diagnosing-bugs n'appelle pas code-review : le bloc l'y ajoute, ses relecteurs suivent.
+  'diagnosing-bugs': ['security-reviewer', 'ui-reviewer'],
+};
+
+function appendPanel(file, skill) {
+  const text = fs.readFileSync(file, 'utf8');
+  if (text.includes(PANEL_START)) return false;
+  const eol = text.includes('\r\n') ? '\r\n' : '\n';
+  const block = fs.readFileSync(path.join(ROOT, 'templates/panel', skill + '.md'), 'utf8').replace(/\r\n/g, '\n').trim().split('\n').join(eol);
+  fs.writeFileSync(file, text.replace(/\s*$/, () => eol + eol + PANEL_START + eol + block + eol + PANEL_END + eol));
+  return true;
+}
+
+// Installe les agents du panel et branche les skills de Matt déjà installés. Un agent du repo de même nom n'est jamais écrasé.
+export function installPanel(input, apply = false) {
+  const repo = repoRoot(input);
+  const lock = readLock(repo);
+  if (!lock) throw new Error('Installer d\'abord les skills de Matt (install)');
+  const skills = Object.keys(PANEL).filter(s => lock.skills[s]);
+  const agents = [...new Set(skills.flatMap(s => PANEL[s]))];
+  const plan = installTemplates(repo, agents.join(','), apply);
+  const patched = skills.map(s => {
+    const file = path.join(repo, SKILLS_DIR, s, 'SKILL.md');
+    const already = fs.existsSync(file) && fs.readFileSync(file, 'utf8').includes(PANEL_START);
+    if (apply && !already) appendPanel(file, s);
+    return { skill: s, state: already ? 'same' : 'add', agents: PANEL[s] };
+  });
+  if (apply) {
+    const next = readLock(repo);
+    next.panel = [...new Set([...(next.panel || []), ...skills])];
+    writeJson(path.join(repo, LOCK), next);
+  }
+  return {
+    applied: apply, agents: plan.templates, skills: patched,
+    notInstalled: Object.keys(PANEL).filter(s => !lock.skills[s]),
+    note: plan.templates.some(t => t.state === 'different') ? 'Un agent du repo porte déjà ce nom : il est gardé. Vérifier qu\'il rend la même ligne de verdict, ou adapter le bloc du skill.' : undefined,
+  };
+}
 
 export function installTemplates(input, wanted = 'board', apply = false) {
   const repo = repoRoot(input);
@@ -397,8 +451,9 @@ export function main(args = process.argv.slice(2)) {
     retire: () => retire(repo, opts.path, opts.confirm, apply),
     'install-templates': () => installTemplates(repo, typeof opts.files === 'string' ? opts.files : 'board', apply),
     'install-board': () => installTemplates(repo, 'board', apply),
+    'install-panel': () => installPanel(repo, apply),
   }[command];
-  if (!run) throw new Error('Commandes : inventory install status upgrade retire install-templates');
+  if (!run) throw new Error('Commandes : inventory install status upgrade retire install-templates install-panel');
   process.stdout.write(JSON.stringify(run(), null, 2) + '\n');
 }
 

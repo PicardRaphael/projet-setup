@@ -97,8 +97,8 @@ Les repos équipés gardent leurs skills : ils sont versionnés dans chaque repo
 | Chemin | Rôle |
 |---|---|
 | `skills/setup/` | le skill `/matt-setup:setup` et ses références (adaptation, optimisations) |
-| `scripts/matt-setup.mjs` | `inventory`, `install`, `status`, `upgrade`, `retire`, `install-templates` (rien n'est écrit sans `--apply`) |
+| `scripts/matt-setup.mjs` | `inventory`, `install`, `status`, `upgrade`, `retire`, `install-templates`, `install-panel` (rien n'est écrit sans `--apply`) |
 | `scripts/sync-upstream.mjs` | mise à jour du snapshot de Matt |
-| `templates/` | `board.mjs`, `hooks/on-edit.mjs`, `hooks/use-cli.mjs`, `ticket-lifecycle.md`, copiés dans les repos à la demande |
+| `templates/` | `board.mjs`, `hooks/`, `agents/` (panel de spécialistes), `panel/` (blocs ajoutés aux skills de Matt), `ticket-lifecycle.md`, copiés dans les repos à la demande |
 | `vendor/` | snapshot des skills de Matt, voir [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) |
 | `tests/` | `node --test "tests/*.test.mjs"` |

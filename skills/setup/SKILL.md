@@ -22,6 +22,7 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/matt-setup.mjs" <commande> --repo "<repo>"
 | `status` | skills intacts ou adaptés, appels cassés, mises à jour disponibles |
 | `upgrade [--apply]` / `upgrade --accept <nom>` | remplace les skills intacts ; valide la fusion d'un skill adapté |
 | `retire --path <chemin> --confirm <même chemin> [--apply]` | archive un skill, agent, commande ou rule dans `.claude/skills-archive/` |
+| `install-panel [--apply]` | installe les agents du panel (contradicteurs, sécurité, UI, approbateur, chercheur interne) et les branche dans les skills de Matt |
 | `install-templates --files board,on-edit,use-cli [--apply]` | copie le tableau de bord et les hooks dans le repo, suivis par le lock ; jamais d'écrasement |
 
 Règle constante : **proposer, montrer, puis appliquer seulement ce que l'utilisateur accepte**, une étape à la fois. Ne jamais committer, publier de ticket ni modifier `~/.claude` sans accord explicite.
@@ -49,7 +50,9 @@ Lis [references/skills.md](references/skills.md) : rôle, profil, mode et dépen
 - **intégrer** : ses conventions vont dans la copie Matt, puis il est archivé ;
 - **archiver** : doublon ou plus utilisé. Un nom proche ne prouve pas un doublon.
 
-Un conflit de nom (`conflicts` dans `install`) se résout avant l'installation : comparer, puis intégrer ou renommer avec l'accord de l'utilisateur. Après accord, `install --skills … --apply`.
+**Panel de spécialistes** : pour un projet avec front et back, données sensibles ou interface d'administration, propose-le en lisant [references/panel.md](references/panel.md), avec `wayfinder` et `implement-spec` si le projet est gros ou flou. Donne l'ordre de grandeur du coût.
+
+Un conflit de nom (`conflicts` dans `install`) se résout avant l'installation : comparer, puis intégrer ou renommer avec l'accord de l'utilisateur. Après accord, `install --skills … --apply`, puis `install-panel --apply` si le panel est retenu.
 
 ## 3. Configuration et adaptation
 
@@ -67,7 +70,7 @@ Lis [references/optimisations.md](references/optimisations.md) et propose seulem
 
 ## 6. Fin
 
-Vérifie que `status` ne signale aucun `brokenCalls`. Récapitule ce qui a été installé, adapté, branché, archivé et optimisé, et ce qui reste à faire par l'utilisateur. Propose un commit unique (`chore: setup Matt skills`) sans le faire avant son oui. Rappelle que `/ask-matt` oriente vers le bon skill.
+Vérifie que `status` ne signale aucun `brokenCalls`. Récapitule ce qui a été installé, adapté, branché, archivé et optimisé, et ce qui reste à faire par l'utilisateur. Propose un commit unique (`chore: setup Matt skills`) sans le faire avant son oui. Rappelle que `/ask-matt` oriente vers le bon skill. Si le repo était vide, rappelle de relancer `/matt-setup:setup` une fois le projet créé (package.json ou pyproject.toml présent) : les hooks, permissions et rules dépendent de la stack réelle.
 
 ## Mise à jour d'un repo déjà installé
 

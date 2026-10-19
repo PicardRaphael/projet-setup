@@ -19,6 +19,36 @@ Dans le repo, lance `/matt-setup:setup`. Claude lit le repo, propose, et n'appli
 
 Les skills sont copiés dans `.claude/skills/` et versionnés : toute l'équipe les reçoit par Git. Relancer `/matt-setup:setup` plus tard fait la mise à jour.
 
+## Les trois parcours
+
+### A. Nouveau projet à partir d'une idée floue (ex. interface admin avec front et back)
+
+1. `mkdir mon-projet`, `git init`, ouvrir Claude Code dedans, `/matt-setup:setup` : socle + `wayfinder` + `implement-spec` + **panel de spécialistes**. Pour un projet qui dépend d'autres systèmes de l'organisation, renseigner `docs/agents/internal-sources.md` (autres repos, base de connaissances).
+2. `/wayfinder <ton idée>` : Claude bâtit une carte de questions et les résout avec toi, une par session. Les recherches sur les systèmes existants partent en parallèle vers `internal-researcher` ; les maquettes passent par `prototype`. Avant de conclure, **trois contradicteurs** (produit, technique, simplicité) attaquent les décisions ; chaque objection non résolue devient une nouvelle question.
+3. `/to-spec` : nouvelle passe des contradicteurs, tu tranches leurs objections, puis la spec est publiée. `/to-tickets` découpe.
+4. Une fois le projet créé (package.json ou pyproject.toml), relancer `/matt-setup:setup` : hooks, permissions et rules adaptés à la vraie stack.
+5. `/implement-spec` : un agent par ticket dans son worktree ; revue avec les relecteurs **sécurité** et **UI/UX** quand ils sont concernés ; **approbateur** avant chaque fusion, qui escalade vers toi ce qui est risqué ou non tranché (colonne « Attend un humain », où tu réponds).
+
+### B. Fonctionnalité floue dans un projet existant
+
+`/matt-setup:setup` une fois (il garde et branche tes skills et agents), puis `/grill-with-docs <la fonctionnalité>` si elle tient en une spec, ou `/wayfinder` si elle est grosse. Ensuite comme A : `/to-spec` (contradicteurs), `/to-tickets`, `/implement` ou `/implement-spec`.
+
+### C. Bug dans un projet existant
+
+`diagnosing-bugs` (il se déclenche quand tu décris le bug, ou dis « diagnose ») : reproduire, hypothèses, instrumentation, correctif et test de non-régression. Avec le panel, le correctif passe ensuite par `code-review` et ses relecteurs avant d'être déclaré terminé. Un bug qui révèle un problème de conception mène à `/improve-codebase-architecture`.
+
+### Le panel de spécialistes (option du setup)
+
+| Agent | Quand | Rôle |
+|---|---|---|
+| `plan-challenger` ×3 | avant de publier une spec ou de clore une carte wayfinder | contredire sous trois angles : produit, technique, simplicité |
+| `internal-researcher` | recherches de wayfinder | trouver les vrais endpoints, tables, règles dans les autres repos et bases de connaissances |
+| `security-reviewer` | revue d'un diff qui touche auth, API, données, secrets | failles avec preuve et correctif |
+| `ui-reviewer` | revue d'un diff front | parcours, états, accessibilité ; regarde l'application si un serveur de dev tourne et qu'un navigateur est disponible, sinon relit le code |
+| `approver` | avant chaque fusion d'implement-spec | approuve, demande une reprise (2 fois au plus) ou escalade vers toi |
+
+Ils s'ajoutent aux deux revues de Matt (normes et spec) sans les remplacer, n'ont aucun outil d'édition (Bash reste disponible pour git) et ne tournent que lorsqu'ils sont concernés.
+
 ## 2. Travailler avec les skills
 
 En cas de doute, tape `/ask-matt` et décris ta situation : il indique le bon chemin.

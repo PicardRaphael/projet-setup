@@ -6,7 +6,7 @@ import os from 'node:os';
 import crypto from 'node:crypto';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { catalog, inventory, install, status, upgrade, acceptAdaptation, retire, installTemplates, TEMPLATES } from '../scripts/matt-setup.mjs';
+import { catalog, inventory, install, status, upgrade, acceptAdaptation, retire, installTemplates, installPanel, TEMPLATES, PANEL } from '../scripts/matt-setup.mjs';
 import { board, html, answer, markdown } from '../templates/board.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -348,4 +348,46 @@ test('inventaire : signale un .scratch ou un .claude ignorés par Git (mémoire 
   assert.deepEqual([inventory(shared, tmp(t)).mattConfig.scratchIgnored, inventory(shared, tmp(t)).mattConfig.claudeIgnored], [false, false]);
   const hidden = repo(t, { '.gitignore': '.scratch/\n.claude/\n' });
   assert.deepEqual([inventory(hidden, tmp(t)).mattConfig.scratchIgnored, inventory(hidden, tmp(t)).mattConfig.claudeIgnored], [true, true]);
+});
+
+test('panel : agents installés, skills branchés, toujours « intacts » et rebranchés après mise à jour', t => {
+  const dir = repo(t, { '.claude/agents/security-reviewer.md': '---\nname: security-reviewer\ndescription: maison\n---\n' });
+  install(dir, 'socle,wayfinder,implement-spec', true);
+  const plan = installPanel(dir);
+  assert.equal(plan.applied, false);
+  assert.deepEqual(plan.skills.map(s => s.skill).sort(), ['code-review', 'diagnosing-bugs', 'implement-spec', 'to-spec', 'wayfinder']);
+  installPanel(dir, true);
+  for (const a of ['plan-challenger', 'ui-reviewer', 'approver', 'internal-researcher']) assert.ok(fs.existsSync(path.join(dir, '.claude/agents', a + '.md')), a);
+  assert.match(fs.readFileSync(path.join(dir, '.claude/agents/security-reviewer.md'), 'utf8'), /maison/, 'agent du repo jamais écrasé');
+  const review = fs.readFileSync(path.join(dir, '.claude/skills/code-review/SKILL.md'), 'utf8');
+  assert.match(review, /<!-- matt-setup:panel:start -->[\s\S]*security-reviewer[\s\S]*<!-- matt-setup:panel:end -->\r?\n$/);
+  installPanel(dir, true);
+  assert.equal(fs.readFileSync(path.join(dir, '.claude/skills/code-review/SKILL.md'), 'utf8'), review, 'idempotent');
+  let st = status(dir);
+  assert.ok(st.skills.every(s => s.state === 'pristine'), 'le bloc du panel n\'est pas une adaptation');
+  // Nouvelle version amont simulée : le skill intact est remplacé puis rebranché.
+  const lockFile = path.join(dir, '.claude/matt-skills.lock.json');
+  const lock = JSON.parse(fs.readFileSync(lockFile, 'utf8'));
+  const old = 'ancienne version\n';
+  fs.writeFileSync(path.join(dir, '.claude/skills/code-review/SKILL.md'), old + '\n<!-- matt-setup:panel:start -->\nx\n<!-- matt-setup:panel:end -->\n');
+  lock.skills['code-review'].files['SKILL.md'] = crypto.createHash('sha256').update(old).digest('hex');
+  fs.writeFileSync(lockFile, JSON.stringify(lock));
+  st = status(dir);
+  assert.deepEqual(st.upgrade.replace, ['code-review']);
+  upgrade(dir, true);
+  const after = fs.readFileSync(path.join(dir, '.claude/skills/code-review/SKILL.md'), 'utf8');
+  assert.match(after, /Standards[\s\S]*<!-- matt-setup:panel:start -->[\s\S]*ui-reviewer/);
+  assert.equal((after.match(/panel:start/g) || []).length, 1);
+});
+
+test('agents du panel : frontmatter valide, lecture seule, ligne de verdict', () => {
+  for (const name of ['plan-challenger', 'security-reviewer', 'ui-reviewer', 'approver', 'internal-researcher']) {
+    const text = fs.readFileSync(path.join(ROOT, 'templates/agents', name + '.md'), 'utf8');
+    assert.match(text, new RegExp('^---\nname: ' + name + '\ndescription: .+\ndisallowedTools: Edit, Write, NotebookEdit\nmodel: (opus|sonnet)\n---'), name);
+    assert.match(text, /^(VERDICT|DECISION|ANSWER): /m, name);
+  }
+  for (const [skill, agents] of Object.entries(PANEL)) {
+    const block = fs.readFileSync(path.join(ROOT, 'templates/panel', skill + '.md'), 'utf8');
+    for (const a of agents) assert.match(block, new RegExp('`' + a + '`'), skill + ' → ' + a);
+  }
 });
