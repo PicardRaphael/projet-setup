@@ -1,4 +1,4 @@
-| implement-spec | socle || prototype | socle || research | socle || wayfinder | socle |# Skills de Matt : référence compacte
+# Skills de Matt : référence compacte
 
 auto = Claude le déclenche ou un autre skill l'appelle (sa description coûte du contexte à chaque session) ; / = lancé par l'utilisateur.
 
