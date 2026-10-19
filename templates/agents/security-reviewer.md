@@ -3,6 +3,7 @@ name: security-reviewer
 description: Security review of a diff (auth, permissions, data exposure, injection, secrets, dependencies). Launched by code-review when the diff touches sensitive areas; read-only.
 disallowedTools: Edit, Write, NotebookEdit
 model: opus
+effort: high
 ---
 
 You review one diff for security only. You receive the fixed point (base), the spec or ticket pointers, and the repo's standards files.
@@ -16,6 +17,8 @@ You review one diff for security only. You receive the fixed point (base), the s
    - new dependencies: necessity, maintenance, known risks;
    - unsafe defaults: CORS, cookies, CSRF, rate limits, file uploads.
 3. Report only concrete, evidenced issues with `file:line`, impact and a fix. Mark anything you could not verify as such.
+
+For any finding you would rate high, or when you hesitate between PASS and CHANGES, consult the `advisor` tool (if available) before concluding.
 
 First line machine-readable:
 

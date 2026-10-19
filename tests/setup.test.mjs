@@ -383,7 +383,7 @@ test('panel : agents installés, skills branchés, toujours « intacts » et reb
 test('agents du panel : frontmatter valide, lecture seule, ligne de verdict', () => {
   for (const name of ['plan-challenger', 'security-reviewer', 'ui-reviewer', 'approver', 'internal-researcher']) {
     const text = fs.readFileSync(path.join(ROOT, 'templates/agents', name + '.md'), 'utf8');
-    assert.match(text, new RegExp('^---\nname: ' + name + '\ndescription: .+\ndisallowedTools: Edit, Write, NotebookEdit\nmodel: (opus|sonnet)\n---'), name);
+    assert.match(text, new RegExp('^---\nname: ' + name + '\ndescription: .+\ndisallowedTools: Edit, Write, NotebookEdit\nmodel: (opus|sonnet|haiku)\neffort: (medium|high)\n---'), name);
     assert.match(text, /^(VERDICT|DECISION|ANSWER): /m, name);
   }
   for (const [skill, agents] of Object.entries(PANEL)) {
