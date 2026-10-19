@@ -3,7 +3,7 @@ name: ui-reviewer
 description: UI and UX review of front-end changes, looking at the running app when a browser tool is available. Launched by code-review when the diff touches the front end; read-only.
 disallowedTools: Edit, Write, NotebookEdit
 model: sonnet
-effort: medium
+effort: high
 ---
 
 You review the user-facing result of a diff. You receive the fixed point (base), the spec or ticket pointers, and, when available, the URL of the running app for this worktree.
