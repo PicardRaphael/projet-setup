@@ -5,7 +5,7 @@
 Keep a lesson only if **all three** hold: it will matter again (it recurred, or surely will), the code and git history do not already show it, and someone else or a later session needs it. Never keep one-off task details, what a diff or commit already says, or transient state (that belongs in the ticket).
 
 Put it at the cheapest level that works:
-- **always loaded** — CLAUDE.md: commands and corrections needed in almost every session. Keep it short; when adding, remove what is obsolete.
+- **always loaded** — CLAUDE.md: commands and corrections needed in almost every session. Keep it short; when adding, remove what is obsolete. In CLAUDE.md, point to other docs with a plain path or link (read only when needed), never `@path` (imported into every session) unless the content is needed every session.
 - **loaded by area** — `.claude/rules/<area>.md` with `paths:`: rules for one part of the code.
 - **read on demand** — `docs/adr/` for lasting decisions, `GLOSSARY.md` for domain terms, the ticket for questions, answers and state.
 

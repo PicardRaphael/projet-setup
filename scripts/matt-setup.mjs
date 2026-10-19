@@ -165,20 +165,28 @@ function stack(repo) {
   return result;
 }
 
-// Contexte chargé à chaque session : CLAUDE.md (et ses @imports directs) et les rules sans `paths:`.
+// Contexte chargé à chaque session : CLAUDE.md, ses imports `@chemin` (en cascade, 4 niveaux au plus, hors code)
+// et les rules sans `paths:`. Un lien Markdown ou un chemin entre backticks n'est pas chargé.
 // Estimation à ~3,7 caractères par token ; au-delà de 2 500 tokens, le setup propose de déplacer.
 export const ALWAYS_LOADED_BUDGET = 2500;
+function importsOf(text) {
+  const prose = text.replace(/^(```|~~~)[\s\S]*?^\1/gm, '').replace(/`[^`\n]*`/g, '');
+  return [...prose.matchAll(/(?:^|\s)@((?:\\ |[^\s"'])+)/g)].map(m => m[1].replace(/\\ /g, ' '));
+}
 function alwaysLoaded(repo) {
   const tokens = text => Math.round(text.length / 3.7);
   const files = [];
-  const add = (file, text) => files.push({ file: posix(path.relative(repo, file)), tokens: tokens(text) });
-  for (const f of ['CLAUDE.md', '.claude/CLAUDE.md', 'CLAUDE.local.md']) {
-    const file = path.join(repo, f);
-    if (!isRegular(file)) continue;
-    const text = fs.readFileSync(file, 'utf8');
-    add(file, text);
-    for (const m of text.matchAll(/^@(\S+)/gm)) { const imported = path.resolve(path.dirname(file), m[1]); if (isRegular(imported) && imported.startsWith(repo)) add(imported, fs.readFileSync(imported, 'utf8')); }
-  }
+  const seen = new Set();
+  const add = (file, text, via) => files.push({ file: posix(path.relative(repo, file)), tokens: tokens(text), ...(via ? { importedBy: via } : {}) });
+  const load = (file, depth, via) => {
+    const real = path.resolve(file);
+    if (seen.has(real) || !isRegular(real)) return;
+    seen.add(real);
+    const text = fs.readFileSync(real, 'utf8');
+    add(real, text, via);
+    if (depth < 4) for (const target of importsOf(text)) load(path.resolve(path.dirname(real), target), depth + 1, posix(path.relative(repo, real)));
+  };
+  for (const f of ['CLAUDE.md', '.claude/CLAUDE.md', 'CLAUDE.local.md']) load(path.join(repo, f), 0, null);
   for (const file of listMarkdown(path.join(repo, '.claude/rules'))) {
     const text = fs.readFileSync(file, 'utf8');
     if (!/^---[\s\S]*?^paths:/m.test(text.split(/^---\s*$/m).slice(0, 2).join('---'))) add(file, text);
