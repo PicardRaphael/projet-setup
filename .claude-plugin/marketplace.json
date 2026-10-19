@@ -1,0 +1,16 @@
+{
+  "name": "matt-setup-local",
+  "owner": {
+    "name": "Raphael Picard"
+  },
+  "plugins": [
+    {
+      "name": "matt-setup",
+      "source": "./",
+      "description": "Setup des skills de Matt Pocock par repo."
+    }
+  ],
+  "metadata": {
+    "description": "Marketplace locale du setup des skills de Matt Pocock."
+  }
+}
