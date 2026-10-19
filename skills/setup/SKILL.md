@@ -35,6 +35,8 @@ Résume : repo neuf ou existant, tracker probable (remote, MCP Atlassian, `.scra
 
 Ne lis les fichiers de `references/` qu'à l'étape qui les cite.
 
+Si `alwaysLoaded.overBudget` est vrai (CLAUDE.md, ses imports et les rules sans `paths:` dépassent environ 2 500 tokens chargés à chaque session) : propose à l'étape 5 de garder dans CLAUDE.md seulement ce qui sert presque à chaque session, de déplacer le reste vers des rules à `paths:` ou vers `docs/`, et de supprimer ce qui est devenu inutile, en montrant le gain en tokens.
+
 ### Repo vide : chemin rapide
 
 Si `inventory` indique `empty: true` (ou un repo sans code ni composant Claude), ne lis aucune référence et ne lance pas le recommandeur. Si `git.isRepo` est faux, propose `git init -b main` dans le même message. Pose en **un seul message** :

@@ -165,6 +165,29 @@ function stack(repo) {
   return result;
 }
 
+// Contexte chargé à chaque session : CLAUDE.md (et ses @imports directs) et les rules sans `paths:`.
+// Estimation à ~3,7 caractères par token ; au-delà de 2 500 tokens, le setup propose de déplacer.
+export const ALWAYS_LOADED_BUDGET = 2500;
+function alwaysLoaded(repo) {
+  const tokens = text => Math.round(text.length / 3.7);
+  const files = [];
+  const add = (file, text) => files.push({ file: posix(path.relative(repo, file)), tokens: tokens(text) });
+  for (const f of ['CLAUDE.md', '.claude/CLAUDE.md', 'CLAUDE.local.md']) {
+    const file = path.join(repo, f);
+    if (!isRegular(file)) continue;
+    const text = fs.readFileSync(file, 'utf8');
+    add(file, text);
+    for (const m of text.matchAll(/^@(\S+)/gm)) { const imported = path.resolve(path.dirname(file), m[1]); if (isRegular(imported) && imported.startsWith(repo)) add(imported, fs.readFileSync(imported, 'utf8')); }
+  }
+  for (const file of listMarkdown(path.join(repo, '.claude/rules'))) {
+    const text = fs.readFileSync(file, 'utf8');
+    if (!/^---[\s\S]*?^paths:/m.test(text.split(/^---\s*$/m).slice(0, 2).join('---'))) add(file, text);
+  }
+  const total = files.reduce((n, f) => n + f.tokens, 0);
+  return { totalTokens: total, budget: ALWAYS_LOADED_BUDGET, overBudget: total > ALWAYS_LOADED_BUDGET, files: files.sort((a, b) => b.tokens - a.tokens) };
+}
+const isRegular = file => { try { return fs.statSync(file).isFile(); } catch { return false; } };
+
 export function inventory(input, home = os.homedir()) {
   const repo = repoRoot(input);
   const lock = readLock(repo);
@@ -204,6 +227,7 @@ export function inventory(input, home = os.homedir()) {
       claudeIgnored: gitOk(repo, ['check-ignore', '-q', '.claude/skills/x/SKILL.md']),
     },
     stack: stack(repo),
+    alwaysLoaded: alwaysLoaded(repo),
     matt: lock ? { source: lock.source, installed: [...managed] } : null,
   };
 }

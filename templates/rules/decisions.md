@@ -1,8 +1,15 @@
 # Working rules (installed by matt-setup)
 
-## Shared memory
+## Memory: what to keep, and where
 
-What others need goes in the repo, not in Claude's personal auto-memory: domain terms → GLOSSARY.md; lasting decisions → docs/adr/; recurring corrections and commands → CLAUDE.md (keep it short); area-specific rules → .claude/rules/; ticket state, questions and answers → the ticket. Auto-memory keeps personal preferences only.
+Keep a lesson only if **all three** hold: it will matter again (it recurred, or surely will), the code and git history do not already show it, and someone else or a later session needs it. Never keep one-off task details, what a diff or commit already says, or transient state (that belongs in the ticket).
+
+Put it at the cheapest level that works:
+- **always loaded** — CLAUDE.md: commands and corrections needed in almost every session. Keep it short; when adding, remove what is obsolete.
+- **loaded by area** — `.claude/rules/<area>.md` with `paths:`: rules for one part of the code.
+- **read on demand** — `docs/adr/` for lasting decisions, `GLOSSARY.md` for domain terms, the ticket for questions, answers and state.
+
+Claude's personal auto-memory keeps personal preferences only; anything the team needs goes in the repo. `/retro` and every agent apply this triage when they record something.
 
 ## Decision protocol
 

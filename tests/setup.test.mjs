@@ -409,3 +409,18 @@ test('mise à jour : un repo équipé du panel reçoit les nouveautés (règle, 
   assert.ok(fs.existsSync(path.join(dir, '.claude/rules/matt-decisions.md')));
   assert.deepEqual(upgrade(dir).added, []);
 });
+
+test('contexte toujours chargé : CLAUDE.md, ses imports et rules sans paths, avec alerte de budget', t => {
+  const dir = repo(t, {
+    'CLAUDE.md': '# P\n@docs/style.md\n' + 'x'.repeat(5000),
+    'docs/style.md': 'y'.repeat(3700),
+    '.claude/rules/api.md': '---\npaths: ["src/api/**"]\n---\n' + 'z'.repeat(9000),
+    '.claude/rules/all.md': 'w'.repeat(1800),
+  });
+  const al = inventory(dir, tmp(t)).alwaysLoaded;
+  assert.deepEqual(al.files.map(f => f.file), ['CLAUDE.md', 'docs/style.md', '.claude/rules/all.md']);
+  assert.equal(al.overBudget, true);
+  assert.equal(inventory(repo(t, { 'CLAUDE.md': '# court' }), tmp(t)).alwaysLoaded.overBudget, false);
+  const rule = fs.readFileSync(path.join(ROOT, 'templates/rules/decisions.md'), 'utf8');
+  assert.ok(rule.length / 3.7 < 1000, 'la rule toujours chargée reste sous 1 000 tokens');
+});
