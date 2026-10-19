@@ -344,7 +344,8 @@ export function upgrade(input, apply = false) {
   // Repo déjà équipé du panel : ajoute ce que les nouvelles versions apportent (agent, règle), sans rien écraser.
   const panel = readLock(repo).panel?.length ? installPanel(repo, apply) : null;
   const added = panel ? [...panel.agents.filter(a => a.state === 'add').map(a => a.path), ...panel.skills.filter(s => s.state === 'add').map(s => s.skill)] : [];
-  return { applied: apply, replace, scripts, merge, added, note: merge.length ? 'Fusionner à la main la nouvelle version amont dans chaque copie adaptée, puis lancer upgrade --accept <nom>.' : undefined };
+  const refreshedBlocks = panel ? panel.skills.filter(s => s.state === 'update').map(s => s.skill) : [];
+  return { applied: apply, replace, scripts, merge, added, refreshedBlocks, note: merge.length ? 'Fusionner à la main la nouvelle version amont dans chaque copie adaptée, puis lancer upgrade --accept <nom>.' : undefined };
 }
 
 // Après fusion d'une copie adaptée : le lock prend la version amont actuelle comme base.
@@ -414,13 +415,24 @@ export const PANEL = {
   'diagnosing-bugs': ['security-reviewer', 'ui-reviewer'],
 };
 
+// Ajoute le bloc du panel, ou le remplace s'il diffère de la version du plugin. Renvoie 'add', 'update' ou 'same'.
+function panelBlock(skill) { return fs.readFileSync(path.join(ROOT, 'templates/panel', skill + '.md'), 'utf8').replace(/\r\n/g, '\n').trim(); }
+function panelState(file, skill) {
+  const text = fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
+  const current = text.match(/<!-- matt-setup:panel:start -->\n([\s\S]*?)\n<!-- matt-setup:panel:end -->/);
+  return !current ? 'add' : current[1].trim() === panelBlock(skill) ? 'same' : 'update';
+}
 function appendPanel(file, skill) {
+  const state = panelState(file, skill);
+  if (state === 'same') return state;
   const text = fs.readFileSync(file, 'utf8');
-  if (text.includes(PANEL_START)) return false;
   const eol = text.includes('\r\n') ? '\r\n' : '\n';
-  const block = fs.readFileSync(path.join(ROOT, 'templates/panel', skill + '.md'), 'utf8').replace(/\r\n/g, '\n').trim().split('\n').join(eol);
-  fs.writeFileSync(file, text.replace(/\s*$/, () => eol + eol + PANEL_START + eol + block + eol + PANEL_END + eol));
-  return true;
+  const wrapped = PANEL_START + eol + panelBlock(skill).split('\n').join(eol) + eol + PANEL_END;
+  const next = state === 'add'
+    ? text.replace(/\s*$/, () => eol + eol + wrapped + eol)
+    : text.replace(/<!-- matt-setup:panel:start -->[\s\S]*?<!-- matt-setup:panel:end -->/, () => wrapped);
+  fs.writeFileSync(file, next);
+  return state;
 }
 
 const GUARD_COMMAND = 'node "$CLAUDE_PROJECT_DIR/.claude/hooks/memory-guard.mjs"';
@@ -454,9 +466,9 @@ export function installPanel(input, apply = false) {
   const guard = guardHook(repo, agents, apply);
   const patched = skills.map(s => {
     const file = path.join(repo, SKILLS_DIR, s, 'SKILL.md');
-    const already = fs.existsSync(file) && fs.readFileSync(file, 'utf8').includes(PANEL_START);
-    if (apply && !already) appendPanel(file, s);
-    return { skill: s, state: already ? 'same' : 'add', agents: PANEL[s] };
+    const state = fs.existsSync(file) ? panelState(file, s) : 'add';
+    if (apply && state !== 'same') appendPanel(file, s);
+    return { skill: s, state, agents: PANEL[s] };
   });
   if (apply) {
     const next = readLock(repo);

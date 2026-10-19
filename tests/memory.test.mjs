@@ -6,7 +6,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { install, installPanel, inventory } from '../scripts/matt-setup.mjs';
+import { install, installPanel, inventory, upgrade } from '../scripts/matt-setup.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 function repo(t, files = {}) {
