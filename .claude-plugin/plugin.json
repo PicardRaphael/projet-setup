@@ -1,6 +1,6 @@
 {
   "name": "matt-setup",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Installe les skills de Matt Pocock dans un repo (neuf ou existant), les adapte à ses conventions et propose nettoyage, hooks, rules, worktrees et suivi.",
   "author": { "name": "Raphael Picard" },
   "license": "MIT",
