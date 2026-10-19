@@ -133,7 +133,7 @@ Avec Jira ou GitHub, le tracker est le tableau de bord. Avec le tracker local (`
 
 ### Ce qui est partagé avec l'équipe
 
-Tout ce qui est dans le repo passe par Git : skills, CLAUDE.md, rules, hooks, `docs/agents/`, glossaire, ADR, et les tickets de `.scratch/` (le setup vérifie qu'ils ne sont pas ignorés par Git). La mémoire automatique de Claude et les documents `/handoff` restent personnels : le setup ajoute à CLAUDE.md une règle qui envoie vers le repo tout ce qui doit servir aux autres, et `/retro` capitalise en fin de session.
+Tout ce qui est dans le repo passe par Git : skills, CLAUDE.md, rules, hooks, `docs/agents/`, glossaire, ADR, et les tickets de `.scratch/` (le setup vérifie qu'ils ne sont pas ignorés par Git). La mémoire automatique de Claude et les documents `/handoff` restent personnels : la rule `.claude/rules/matt-decisions.md` envoie vers le repo tout ce qui doit servir aux autres, sans alourdir CLAUDE.md, et `/retro` capitalise en fin de session.
 
 ## 5. Ce qui est garanti par du code, et ce qui dépend de Claude
 

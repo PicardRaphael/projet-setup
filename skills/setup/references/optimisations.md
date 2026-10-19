@@ -87,15 +87,7 @@ Avec le tracker local, trois éléments vont ensemble :
 La mémoire automatique de Claude (`~/.claude/projects/…`) et les documents de `/handoff` restent sur la machine de chacun. Ce qui doit servir à toute l'équipe vit dans le repo et passe par Git.
 
 - `inventory` signale `scratchIgnored` et `claudeIgnored`. Si `.scratch/` ou `.claude/skills/` est ignoré par Git alors que l'équipe doit partager tickets, réponses et skills : proposer de retirer la règle du `.gitignore` (seulement `.claude/settings.local.json` et `.claude/worktrees/` restent personnels).
-- Ajouter au bloc `## Agent skills` de CLAUDE.md (ou AGENTS.md) une règle courte, adaptée à la langue du repo :
-
-  ```markdown
-  ### Mémoire partagée
-  Ce qui doit servir aux autres va dans le repo, pas dans la mémoire personnelle de Claude :
-  termes métier → GLOSSARY.md ; décisions → docs/adr/ ; règles de travail → CLAUDE.md ou .claude/rules/ ;
-  état d'un ticket, questions et réponses → le ticket du tracker. La mémoire automatique ne garde que les préférences personnelles.
-  ```
-
+- Installer la rule `install-templates --files decisions --apply` (`.claude/rules/matt-decisions.md`, versionnée, chargée à chaque session) : elle dit où ranger la mémoire d'équipe et comment décider sans interrompre l'utilisateur. **Ne rien ajouter à CLAUDE.md ni AGENTS.md pour ça** : ils restent courts (commandes, corrections d'erreurs récurrentes), comme le recommande l'équipe de Claude Code.
 - `/retro` (socle) met à jour les instructions du repo en fin de session : le rappeler à l'utilisateur comme moyen de capitaliser pour l'équipe.
 - Si un agent du repo utilise le champ `memory:`, préférer la portée projet, versionnée, à la portée utilisateur quand ce qu'il retient doit être partagé (vérifier la syntaxe dans la documentation des sous-agents).
 

@@ -77,7 +77,7 @@ Pour chaque élément à archiver, lance d'abord `retire --path <chemin> --confi
 
 ## 5. Optimisations
 
-Lis [references/optimisations.md](references/optimisations.md) et propose seulement ce que l'inventaire justifie, en commençant toujours par la mémoire partagée (`.scratch/` et `.claude/` versionnés, règle « Mémoire partagée » dans CLAUDE.md) : permissions, hooks (formatage, bons outils), rules, worktrees, la seconde opinion du recommandeur officiel, et pour le tracker local le cycle de vie des tickets, le tableau de bord et la reprise au démarrage. Fusionne sans supprimer l'existant, ni dupliquer un hook déjà présent. Modifier ou remplacer un de ses composants (hook, agent, skill gardé) est une proposition à part, qui le nomme et montre le diff : un accord global sur « les optimisations » ne la couvre pas.
+Lis [references/optimisations.md](references/optimisations.md) et propose seulement ce que l'inventaire justifie, en commençant toujours par la mémoire partagée (`.scratch/` et `.claude/` versionnés, rule `matt-decisions` ; rien d'ajouté à CLAUDE.md ni AGENTS.md, qui restent courts) : permissions, hooks (formatage, bons outils), rules, worktrees, la seconde opinion du recommandeur officiel, et pour le tracker local le cycle de vie des tickets, le tableau de bord et la reprise au démarrage. Fusionne sans supprimer l'existant, ni dupliquer un hook déjà présent. Modifier ou remplacer un de ses composants (hook, agent, skill gardé) est une proposition à part, qui le nomme et montre le diff : un accord global sur « les optimisations » ne la couvre pas.
 
 ## 6. Fin
 
