@@ -101,7 +101,7 @@ La mémoire automatique de Claude (`~/.claude/projects/…`) et les documents de
 
 ## Seconde opinion : serveurs MCP, plugins, agents spécialisés
 
-Après ta propre analyse, obtiens l'avis du recommandeur officiel d'Anthropic (plugin `claude-code-setup`, lecture seule) : il propose serveurs MCP, plugins et sous-agents adaptés à la stack (ex. context7 pour la doc des librairies, Playwright pour une app web).
+Seulement si le repo contient du code (une stack détectée) ; jamais sur un repo vide. Après ta propre analyse, obtiens l'avis du recommandeur officiel d'Anthropic (plugin `claude-code-setup`, lecture seule) : il propose serveurs MCP, plugins et sous-agents adaptés à la stack (ex. context7 pour la doc des librairies, Playwright pour une app web).
 
 1. Vérifie sa présence : `claude plugin list` contient `claude-code-setup`.
 2. Absent : demande une fois « J'installe le plugin officiel claude-code-setup (recommandations d'automatisation, lecture seule) ? », puis sur un oui lance toi-même `claude plugin install claude-code-setup@claude-plugins-official`.

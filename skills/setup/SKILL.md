@@ -33,6 +33,17 @@ Lance `inventory`, puis lis réellement chaque fichier listé : CLAUDE.md/AGENTS
 
 Résume : repo neuf ou existant, tracker probable (remote, MCP Atlassian, `.scratch/`), stack et commandes de validation, composants existants. Signale `personalSkillsShadowingMatt` (un skill personnel masque celui du projet) et `globalMattKit` (l'ancien kit global fait doublon : l'utilisateur le désinstalle lui-même). Si `matt` n'est pas nul, va à « Mise à jour ».
 
+Ne lis les fichiers de `references/` qu'à l'étape qui les cite.
+
+### Repo vide : chemin rapide
+
+Si `inventory` indique `empty: true` (ou un repo sans code ni composant Claude), ne lis aucune référence et ne lance pas le recommandeur. Si `git.isRepo` est faux, propose `git init -b main` dans le même message. Pose en **un seul message** :
+1. l'idée du projet en une phrase, et s'il est gros ou encore flou ;
+2. le tracker : local `.scratch/` (recommandé sans remote), Jira (clé du projet) ou GitHub ;
+3. front, back, données sensibles ou interface d'administration ?
+
+Puis, après la réponse : `install --skills socle` (+ `wayfinder,implement-spec` si gros ou flou), `install-panel` si la réponse 3 le justifie, configuration Matt (étape 3, sans adaptation), et fin (étape 6). Rappelle de relancer le setup une fois le projet créé : hooks, permissions et rules dépendent de la vraie stack.
+
 ## 2. Proposition
 
 Lis [references/skills.md](references/skills.md) : rôle, profil, mode et dépendances de chaque skill.
